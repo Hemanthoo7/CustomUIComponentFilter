@@ -15,13 +15,13 @@ class LikeFilter implements FilterApplierInterface
     {
         if($this->isShippingAddressField($filter)){
             $postCodeCondition = $this->getPostCodeCondition($filter);
-            $collection->addFieldToFilter($this->getPostCodeField($filter,$postCodeCondition),$postCodeCondition);
+            $collection->addFieldToFilter($this->getPostCodeField($filter,$postCodeCondition), $postCodeCondition);
         }else{
             $collection->addFieldToFilter($filter->getField(), [$filter->getConditionType() => $filter->getValue()]);
         }
     }
 
-    private function isShippingAddressField(Filter $filter)
+    private function isShippingAddressField(Filter $filter):bool
     {
         return 'shipping_address' === $filter->getField();
     }
@@ -32,23 +32,23 @@ class LikeFilter implements FilterApplierInterface
 
         $result = [];
         foreach ($postCodes as $key => $value){
-            $result['key_'.$key] = [$filter->getConditionType() => sprintf('%%s%%', $value)];
+            $result['key_'. $key] = [$filter->getConditionType() => sprintf('%%s%%', $value)];
         }
         return $result;
     }
 
     private function getPostCodeValues(string $postCode):array
     {
-        $cleanPostCode = preg_replace("/[^A-Za-z\d]/", '', $postCode);
+        $cleanPostCode = preg_replace("/[^A-Za-z0-9]/", '', $postCode);
 
         $result[] = $cleanPostCode;
 
         if (strlen($cleanPostCode) === 5) {
-            $postCode = substr($cleanPostCode, 0, 2) . ' ' . substr($cleanPostCode, 2, 3,);
+            $postCode = substr($cleanPostCode, 0,2). ' ' . substr($cleanPostCode, 2, 3);
         } elseif (strlen($cleanPostCode) === 6) {
-            $postCode = substr($cleanPostCode, 0, 3) . ' ' . substr($cleanPostCode, 3, 3,);
+            $postCode = substr($cleanPostCode, 0,3). ' ' . substr($cleanPostCode, 3, 3);
         } elseif (strlen($cleanPostCode) === 7) {
-            $postCode = substr($cleanPostCode, 0, 4) . ' ' . substr($cleanPostCode, 4, 3,);
+            $postCode = substr($cleanPostCode, 0,4) . ' ' .substr($cleanPostCode, 4, 3);
         }
         $result[] = $postCode;
         return $result;
